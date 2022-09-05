@@ -66,15 +66,19 @@ class custom_concat(Dataset):
 	def __getitem__(self, idx):
 		image = self.data[idx]
 
-		if self.targets[idx] > 10:
-			target = ((self.targets[idx])//10)*10 + np.random.choice(10)
+		#print(self.targets[idx] ,'fevte')
+		if self.targets[idx][0] > 0:
+			tmp_ = np.random.choice(10)
+		else:
+			tmp_ = self.targets[idx][1]
 
-		target = self.targets[idx]
+		target = (self.targets[idx][0], tmp_)
 		return (image, target)
 
 	def __len__(self):
 		return len(self.targets)
 
+		
 def create_cifar100_task(tasks, slot, shift, train=True, shuffle=False, bs=256):
 	# Don't use CIFAR10 mean/std to avoid leaking info 
 	# Instead use (mean, std) of (0.5, 0.25)
