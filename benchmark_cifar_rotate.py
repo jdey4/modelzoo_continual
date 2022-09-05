@@ -315,7 +315,7 @@ def run_zoo(shift, angle, bb=5, epochs=50):
 	
 
 	with open('angle/model_zoo_'+ str(angle)+'_'+str(shift)+'.pickle', 'wb') as f:
-		pickle.dump(acc)
+		pickle.dump(acc, f)
 	
 	return zoo_log
 # %%
