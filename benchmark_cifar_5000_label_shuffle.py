@@ -15,7 +15,7 @@ from tqdm import tqdm
 import pandas as pd
 import pickle
 # %%
-dev = 'cuda' 
+dev = 'cpu' 
 EPISODES = 10
 # %%
 # Download dataset
@@ -66,10 +66,13 @@ class custom_concat(Dataset):
 	def __getitem__(self, idx):
 		image = self.data[idx]
 
-		if self.targets[idx] > 10:
-			target = ((self.targets[idx])//10)*10 + np.random.choice(10)
+		#print(self.targets[idx] ,'fevte')
+		if self.targets[idx][0] > 0:
+			tmp_ = np.random.choice(10)
+		else:
+			tmp_ = self.targets[idx][1]
 
-		target = self.targets[idx]
+		target = (self.targets[idx][0], tmp_)
 		return (image, target)
 
 	def __len__(self):
@@ -282,7 +285,7 @@ def run_zoo(shift, bb=5, epochs=50):
 	
 
 	for ep in range(EPISODES):
-		tasks_.extend(ep+1)
+		tasks_.extend([ep+1])
 
 		print("Epsisode " + str(ep))
 		zoo_outputs[ep] = [[], []]  
@@ -294,7 +297,7 @@ def run_zoo(shift, bb=5, epochs=50):
 		zoo_log[ep] = evaluate_zoo(ep, zoo_outputs)
 		train_losses = zoo_log[ep]["train_loss"]
 
-		accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc'])[0])
+		accuracies_across_tasks.extend([list(zoo_log[ep]['test_acc'])[0]])
 		print("Test Accuracies of the zoo:\n  %s\n" % str(zoo_log[ep]['test_acc']))
 
 	#print(tasks_, 'tasks')
