@@ -18,7 +18,7 @@ from skimage.transform import rotate
 from scipy import ndimage
 from skimage.util import img_as_ubyte
 # %%
-dev = 'cpu'
+dev = 'cuda'
 EPISODES = 2
 #%%
 def image_aug(pic, angle, centroid_x=23, centroid_y=23, win=16, scale=1.45):
