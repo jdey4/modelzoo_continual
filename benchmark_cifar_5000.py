@@ -15,7 +15,7 @@ from tqdm import tqdm
 import pandas as pd
 import pickle
 # %%
-dev = 'cuda'
+dev = 'cpu'
 EPISODES = 10
 # %%
 # Download dataset
@@ -71,7 +71,7 @@ class custom_concat(Dataset):
 	def __len__(self):
 		return len(self.targets)
 
-def create_cifar100_task(tasks, slot, shift, train=True, shuffle=False, bs=256):
+def create_cifar100_task(tasks, shift, train=True, shuffle=False, bs=256):
 	# Don't use CIFAR10 mean/std to avoid leaking info 
 	# Instead use (mean, std) of (0.5, 0.25)
 	transform = transforms.Compose([
@@ -97,7 +97,7 @@ def create_cifar100_task(tasks, slot, shift, train=True, shuffle=False, bs=256):
 			indx = np.roll(idx[cls],(shift-1)*100)
 			#print(combined_targets[indx[0]])
 			#print(indx[0][slot*50:(slot+1)*50], slot)
-			train_idx.extend(list(indx[slot*50:(slot+1)*50]))
+			train_idx.extend(list(indx[:500]))
 			test_idx.extend(list(indx[500:600]))
 	
 	if train:
@@ -202,7 +202,7 @@ def sample_task(train_losses, episode, bb):
 	tasks = [int(t) for t in tasks]
 	return tasks
 
-def train_model(tasks, epochs, slot, shift):
+def train_model(tasks, epochs, shift):
 	# Train a single model on the Model Zoo
 	net = SmallConv()
 	if dev != 'cpu':
@@ -210,7 +210,7 @@ def train_model(tasks, epochs, slot, shift):
 	
 	# No cosine-annlealing, fp16, small batch-size
 	# This leads to worse accuracies, but leads to simpler/faster code
-	mttask_loader = create_cifar100_task(tasks, slot, shift, shuffle=True, bs=32)
+	mttask_loader = create_cifar100_task(tasks, shift, shuffle=True, bs=32)
 	optimizer = optim.SGD(net.parameters(), lr=0.01,momentum=0.9,
 						  nesterov=True,weight_decay=0.00001)
 	criterion = nn.CrossEntropyLoss()
@@ -267,76 +267,75 @@ def evaluate_zoo(episode, zoo_outputs):
 
 	return met
 # %%
-def run_zoo(slot, shift, bb=5, epochs=50):
+def run_zoo(shift, bb=5, epochs=50):
 	zoo_outputs = {}
 	zoo_log = {}
 	train_losses = []
 
-	'''tasks_ = []
+	tasks_ = []
 	base_tasks = []
 	accuracies_across_tasks = []
-	df_multitask = pd.DataFrame()'''
+	df_multitask = pd.DataFrame()
 	singletask_accuracy = []
 	df_singletask = pd.DataFrame()
 
 	for ep in range(EPISODES):
-		'''base_tasks.extend([ep+1]*(ep+1))
-		tasks_.extend(list(range(1,ep+2)))'''
+		base_tasks.extend([ep+1]*(ep+1))
+		tasks_.extend(list(range(1,ep+2)))
 
 		print("Epsisode " + str(ep))
 		zoo_outputs[ep] = [[], []]  
 		tasks = sample_task(train_losses, ep, bb)
 	
 		print("Training model on tasks: " + str(tasks))
-		model = train_model(tasks, epochs, slot, shift)
+		model = train_model(tasks, epochs, shift)
 		update_zoo(model, tasks, zoo_outputs)
 		zoo_log[ep] = evaluate_zoo(ep, zoo_outputs)
 		train_losses = zoo_log[ep]["train_loss"]
 
-		#accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc']))
+		accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc']))
 		print("Test Accuracies of the zoo:\n  %s\n" % str(zoo_log[ep]['test_acc']))
 
 	#print(tasks_, 'tasks')
 	#print(base_tasks, 'base')
 	#print(accuracies_across_tasks, 'acc')
-	'''df_multitask['task'] = tasks_
+	df_multitask['task'] = tasks_
 	df_multitask['base_task'] = base_tasks
-	df_multitask['accuracy'] = accuracies_across_tasks'''
-	df_singletask['task'] = list(range(1,11))
-	df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])
+	df_multitask['accuracy'] = accuracies_across_tasks
+	'''df_singletask['task'] = list(range(1,11))
+	df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])'''
 
-	with open('results/model_zoo_'+ str(slot+1)+'_'+str(shift)+'.pickle', 'rb') as f:
-		df_multitask = pickle.load(f)
+	with open('results/model_zoo_'+str(shift)+'.pickle', 'wb') as f:
+		pickle.dump(df_multitask, f)
 
-	df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
+	'''df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
 
 	summary = (df_multitask, df_singletask)
-	with open('results/model_zoo_'+ str(slot+1)+'_'+str(shift)+'.pickle', 'wb') as f:
-		pickle.dump(summary, f)
+	with open('results/model_zoo_'+str(shift)+'.pickle', 'wb') as f:
+		pickle.dump(summary, f)'''
 	
 	return zoo_log
 # %%
 for shift in range(1,7):
-	for slot in range(10):
-		# Create dataloaders for each task
-		train_loaders = []
-		test_loaders = []
+	# Create dataloaders for each task
+	train_loaders = []
+	test_loaders = []
 
-		for i in range(10):
-			train_loaders.append(create_cifar100_task([i], slot=slot, shift=shift, train=True))
-			test_loaders.append(create_cifar100_task([i], slot=slot, shift=shift, train=False))
+	for i in range(10):
+		train_loaders.append(create_cifar100_task([i], shift=shift, train=True))
+		test_loaders.append(create_cifar100_task([i], shift=shift, train=False))
 
-		all_targets = []
+	all_targets = []
 
-		for i in range(10):
-			all_targets.append([])
-			for loader in [train_loaders[i], test_loaders[i]]:
-				task_targets = []
-				for dat, target in loader:
-					task_targets.append(target[1].numpy())
-				task_targets = np.concatenate(task_targets)
-				all_targets[i].append(task_targets)
+	for i in range(10):
+		all_targets.append([])
+		for loader in [train_loaders[i], test_loaders[i]]:
+			task_targets = []
+			for dat, target in loader:
+				task_targets.append(target[1].numpy())
+			task_targets = np.concatenate(task_targets)
+			all_targets[i].append(task_targets)
 
-		#zoo_log = run_zoo(slot, shift, bb=5, epochs=5)
-		isolated_log = run_zoo(slot, shift, bb=1, epochs=5)
+	zoo_log = run_zoo(shift, bb=5, epochs=5)
+	#isolated_log = run_zoo(shift, bb=1, epochs=5)
 # %%
