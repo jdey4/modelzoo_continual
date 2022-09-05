@@ -233,18 +233,17 @@ def update_zoo(net, tasks, zoo_outputs):
 	criterion = nn.CrossEntropyLoss()
 	net.eval()
 
-	with torch.inference_mode():
-		for tid in tasks:
-			for idx, dataloader in enumerate([train_loaders[tid], test_loaders[tid]]):
-				outputs = []
-				for dat, target in dataloader:
-					dat, labels, tasks = process_dat(dat, target)
-					out = net(dat.float(), tasks)
-					out = nn.functional.softmax(out, dim=1)
-					out = out.cpu().detach().numpy()
-					outputs.append(out)
-				outputs = np.concatenate(outputs)
-				zoo_outputs[tid][idx].append(outputs)
+	for tid in tasks:
+		for idx, dataloader in enumerate([train_loaders[tid], test_loaders[tid]]):
+			outputs = []
+			for dat, target in dataloader:
+				dat, labels, tasks = process_dat(dat, target)
+				out = net(dat.float(), tasks)
+				out = nn.functional.softmax(out, dim=1)
+				out = out.cpu().detach().numpy()
+				outputs.append(out)
+			outputs = np.concatenate(outputs)
+			zoo_outputs[tid][idx].append(outputs)
 
 
 def evaluate_zoo(episode, zoo_outputs):
