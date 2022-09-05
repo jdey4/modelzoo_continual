@@ -299,20 +299,20 @@ def run_zoo(shift, bb=5, epochs=50):
 	#print(tasks_, 'tasks')
 	#print(base_tasks, 'base')
 	#print(accuracies_across_tasks, 'acc')
-	df_multitask['task'] = tasks_
+	'''df_multitask['task'] = tasks_
 	df_multitask['base_task'] = base_tasks
-	df_multitask['accuracy'] = accuracies_across_tasks
-	'''df_singletask['task'] = list(range(1,11))
-	df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])'''
+	df_multitask['accuracy'] = accuracies_across_tasks'''
+	df_singletask['task'] = list(range(1,11))
+	df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])
 
-	with open('results/model_zoo_'+str(shift)+'.pickle', 'wb') as f:
-		pickle.dump(df_multitask, f)
+	with open('results/model_zoo_'+str(shift)+'.pickle', 'rb') as f:
+		df_multitask = pickle.load(f)
 
-	'''df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
+	df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
 
 	summary = (df_multitask, df_singletask)
 	with open('results/model_zoo_'+str(shift)+'.pickle', 'wb') as f:
-		pickle.dump(summary, f)'''
+		pickle.dump(summary, f)
 	
 	return zoo_log
 # %%
@@ -336,6 +336,6 @@ for shift in range(1,7):
 			task_targets = np.concatenate(task_targets)
 			all_targets[i].append(task_targets)
 
-	zoo_log = run_zoo(shift, bb=5, epochs=5)
-	#isolated_log = run_zoo(shift, bb=1, epochs=5)
+	#zoo_log = run_zoo(shift, bb=5, epochs=5)
+	isolated_log = run_zoo(shift, bb=1, epochs=5)
 # %%
