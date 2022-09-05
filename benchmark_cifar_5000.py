@@ -15,7 +15,7 @@ from tqdm import tqdm
 import pandas as pd
 import pickle
 # %%
-dev = 'cuda'
+dev = 'cpu'
 EPISODES = 10
 # %%
 # Download dataset
