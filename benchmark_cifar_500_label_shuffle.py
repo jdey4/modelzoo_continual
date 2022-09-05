@@ -78,7 +78,7 @@ class custom_concat(Dataset):
 	def __len__(self):
 		return len(self.targets)
 
-		
+
 def create_cifar100_task(tasks, slot, shift, train=True, shuffle=False, bs=256):
 	# Don't use CIFAR10 mean/std to avoid leaking info 
 	# Instead use (mean, std) of (0.5, 0.25)
@@ -286,7 +286,7 @@ def run_zoo(slot, shift, bb=5, epochs=50):
 	
 
 	for ep in range(EPISODES):
-		tasks_.extend(ep+1)
+		tasks_.extend([ep+1])
 
 		print("Epsisode " + str(ep))
 		zoo_outputs[ep] = [[], []]  
@@ -298,7 +298,7 @@ def run_zoo(slot, shift, bb=5, epochs=50):
 		zoo_log[ep] = evaluate_zoo(ep, zoo_outputs)
 		train_losses = zoo_log[ep]["train_loss"]
 
-		accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc'])[0])
+		accuracies_across_tasks.extend([list(zoo_log[ep]['test_acc'])[0]])
 		print("Test Accuracies of the zoo:\n  %s\n" % str(zoo_log[ep]['test_acc']))
 
 	#print(tasks_, 'tasks')
