@@ -75,7 +75,8 @@ def get_data(task=0):
 
         images = os.listdir(path)
         total_images = len(images)
-        train_indx = sample(range(total_images), SAMPLE_PER_CLASS)
+        train_indx = list(range(SAMPLE_PER_CLASS))
+        #sample(range(total_images), SAMPLE_PER_CLASS)
         test_indx = np.delete(range(total_images), train_indx)
         for ii in train_indx:
             image_data = cv2.imread(
@@ -362,6 +363,7 @@ train_loaders = []
 test_loaders = []
 
 for i in range(100):
+    tr, te = create_food1k_task([i], train=True)
     train_loaders.append(create_food1k_task([i], train=True))
     test_loaders.append(create_food1k_task([i], train=False))
 
