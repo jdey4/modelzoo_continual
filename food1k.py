@@ -20,7 +20,7 @@ import os
 # %%
 dev = 'gpu'
 EPISODES = 100
-TRAIN_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/train'
+TRAIN_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Train'
 VAL_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Val'
 SAMPLE_PER_CLASS = 60
 NUM_CLASS_PER_TASK = 10
