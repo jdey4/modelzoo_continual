@@ -136,20 +136,23 @@ def create_food1k_task(tasks, train=True, shuffle=False, bs=256):
                 current_train = cat(current_train[0], data_train), cat(current_train[1], label_train)
                 current_test = cat(current_test[0], data_test), cat(current_test[1], label_test)
 
-    if train:
-        dataset = MyDataloader(current_train[0], current_train[1])
-    else:
-        dataset = MyDataloader(current_test[0], current_test[1])
+    train_dataset = MyDataloader(current_train[0], current_train[1])
+    
+    test_dataset = MyDataloader(current_test[0], current_test[1])
 
     #print(dataset.targets[2399], len(dataset))
-    dataset.targets = [(tmap[dataset.targets[j]], cmap[dataset.targets[j]]) for j in range(len(dataset))]
-    
+    train_dataset.targets = [(tmap[train_dataset.targets[j]], cmap[train_dataset.targets[j]]) for j in range(len(train_dataset))]
+    test_dataset.targets = [(tmap[test_dataset.targets[j]], cmap[test_dataset.targets[j]]) for j in range(len(test_dataset))]
     # Create dataloader. Set workers to 0, since too few batches
-    dataloader = DataLoader(
-        dataset, batch_size=bs, shuffle=shuffle,
+    train_dataloader = DataLoader(
+        train_dataset, batch_size=bs, shuffle=shuffle,
         num_workers=0, pin_memory=True)
     
-    return dataloader
+    test_dataloader = DataLoader(
+        test_dataset, batch_size=bs, shuffle=shuffle,
+        num_workers=0, pin_memory=True)
+    
+    return train_dataloader, test_dataloader
 
 #%%
 class SmallConv(nn.Module):
