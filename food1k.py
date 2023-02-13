@@ -42,7 +42,7 @@ food1k =  []
 
 for ii in range(EPISODES):
     food1k.append(
-        list(range(10))
+        list(range(ii*10,(ii+1)*10))
     )
 
 '''task_names = ["Aq. Mammals", "Fish",
