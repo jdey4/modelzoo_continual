@@ -152,7 +152,10 @@ def create_food1k_task(tasks, train=True, shuffle=False, bs=256):
         test_dataset, batch_size=bs, shuffle=shuffle,
         num_workers=0, pin_memory=True)
     
-    return train_dataloader, test_dataloader
+    if train:
+        return train_dataloader
+    else:
+        return train_dataloader, test_dataloader
 
 #%%
 class SmallConv(nn.Module):
@@ -366,9 +369,9 @@ train_loaders = []
 test_loaders = []
 
 for i in range(100):
-    tr, te = create_food1k_task([i], train=True)
-    train_loaders.append(create_food1k_task([i], train=True))
-    test_loaders.append(create_food1k_task([i], train=False))
+    tr, te = create_food1k_task([i], train=False)
+    train_loaders.append(tr)
+    test_loaders.append(te)
 
 all_targets = []
 
