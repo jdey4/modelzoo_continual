@@ -184,7 +184,7 @@ class SmallConv(nn.Module):
         self.fc2 = nn.Linear(in_features=2000, out_features=2000)
         self.bn_fc2 = nn.BatchNorm1d(2000)
         self.relu_fc2 = nn.ReLU()
-        self.fc3 = nn.Linear(in_features=2000, out_features=100)
+        self.fc3 = nn.Linear(in_features=2000, out_features=1000)
 
         self.softmax = nn.Softmax()
 
@@ -207,7 +207,7 @@ class SmallConv(nn.Module):
         out = self.bn5(out)
         out = self.relu5(out)
         #print(out.size(0), out.size(1), out.size(2), out.size(3))
-        out = out.view(-1, 254 * 6 * 6)
+        out = out.view(-1, 130048)
         
         out = self.fc1(out)
         out = self.bn_fc1(out)
@@ -215,7 +215,7 @@ class SmallConv(nn.Module):
         out = self.fc2(out)
         out = self.bn_fc2(out)
         out = self.relu_fc2(out)
-        out = self.fc3(out).reshape(-1,20,5)
+        out = self.fc3(out).reshape(-1,100,10)
 
         #print(out.size(0), 'fsdsrv')
         out = out[torch.arange(out.size(0)), list(tasks), :]
