@@ -107,9 +107,9 @@ def get_data(task=0):
                 category
             )
 
-    train_X = np.array(train_X).reshape(-1,IMG_SIZE,IMG_SIZE,3)
+    train_X = np.array(train_X).reshape(-1,3,IMG_SIZE,IMG_SIZE)
     train_y = np.array(train_y)
-    test_X = np.array(test_X).reshape(-1,IMG_SIZE,IMG_SIZE,3)
+    test_X = np.array(test_X).reshape(-1,3,IMG_SIZE,IMG_SIZE)
     test_y = np.array(test_y)
     
     return train_X, train_y, test_X, test_y
