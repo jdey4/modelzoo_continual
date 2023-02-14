@@ -355,7 +355,7 @@ def run_zoo(bb=5, epochs=50):
     df_singletask['task'] = list(range(1,101))
     df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])
 
-    with open('food1k/model_zoo.pickle', 'rb') as f:
+    with open('food1k/model_zoo.pickle', 'wb') as f:
         pickle.dump(df_singletask, f)
 
     '''with open('food1k/model_zoo.pickle', 'rb') as f:
