@@ -18,7 +18,7 @@ import pickle
 import cv2
 import os
 # %%
-dev = 'gpu'
+dev = 'cuda'
 EPISODES = 100
 TRAIN_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Train'
 VAL_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Val'
