@@ -323,15 +323,15 @@ def run_zoo(bb=5, epochs=50):
     zoo_log = {}
     train_losses = []
 
-    '''tasks_ = []
+    tasks_ = []
     base_tasks = []
     accuracies_across_tasks = []
-    df_multitask = pd.DataFrame()'''
+    df_multitask = pd.DataFrame()
     df_singletask = pd.DataFrame()
 
     for ep in range(EPISODES):
-        '''base_tasks.extend([ep+1]*(ep+1))
-        tasks_.extend(list(range(1,ep+2)))'''
+        base_tasks.extend([ep+1]*(ep+1))
+        tasks_.extend(list(range(1,ep+2)))
 
         print("Epsisode " + str(ep))
         zoo_outputs[ep] = [[], []]  
@@ -349,23 +349,23 @@ def run_zoo(bb=5, epochs=50):
     #print(tasks_, 'tasks')
     #print(base_tasks, 'base')
     #print(accuracies_across_tasks, 'acc')
-    '''df_multitask['task'] = tasks_
+    df_multitask['task'] = tasks_
     df_multitask['base_task'] = base_tasks
-    df_multitask['accuracy'] = accuracies_across_tasks'''
-    df_singletask['task'] = list(range(1,101))
+    df_multitask['accuracy'] = accuracies_across_tasks
+    '''df_singletask['task'] = list(range(1,101))
     df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])
 
     with open('food1k/model_zoo.pickle', 'wb') as f:
-        pickle.dump(df_singletask, f)
+        pickle.dump(df_singletask, f)'''
 
-    '''with open('food1k/model_zoo.pickle', 'rb') as f:
+    with open('food1k/model_zoo.pickle', 'rb') as f:
         df_multitask = pickle.load(f)
 
     df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
 
     summary = (df_multitask, df_singletask)
     with open('food1k/model_zoo.pickle', 'wb') as f:
-        pickle.dump(summary, f)'''
+        pickle.dump(summary, f)
     
     return zoo_log
 # %%
@@ -389,6 +389,6 @@ for i in range(100):
         task_targets = np.concatenate(task_targets)
         all_targets[i].append(task_targets)
 
-#zoo_log = run_zoo(bb=5, epochs=5)
-isolated_log = run_zoo(bb=1, epochs=5)
+zoo_log = run_zoo(bb=5, epochs=5)
+#isolated_log = run_zoo(bb=1, epochs=5)
 # %%
