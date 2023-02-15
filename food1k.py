@@ -359,7 +359,7 @@ def run_zoo(bb=5, epochs=50):
         pickle.dump(df_singletask, f)'''
 
     with open('food1k/model_zoo.pickle', 'rb') as f:
-        df_multitask = pickle.load(f)
+        df_singletask = pickle.load(f)
 
     df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
 
