@@ -343,7 +343,7 @@ def run_zoo(bb=5, epochs=50):
         zoo_log[ep] = evaluate_zoo(ep, zoo_outputs)
         train_losses = zoo_log[ep]["train_loss"]
 
-        #accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc']))
+        accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc']))
         print("Test Accuracies of the zoo:\n  %s\n" % str(zoo_log[ep]['test_acc']))
 
     #print(tasks_, 'tasks')
