@@ -373,7 +373,7 @@ def run_zoo(bb=5, epochs=50):
 train_loaders = []
 test_loaders = []
 
-for i in range(100):
+for i in range(EPISODES):
     tr, te = create_food1k_task([i], train=False)
     train_loaders.append(tr)
     test_loaders.append(te)
