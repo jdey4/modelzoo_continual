@@ -18,9 +18,9 @@ import pickle
 import cv2
 import os
 # %%
-dev = 'cuda'
+dev = 'cpu'
 EPISODES = 50
-TRAIN_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Train'
+TRAIN_DATADIR = '/Users/jayantadey/Downloads/LargeFineFoodAI/train'#'/cis/home/jdey4/LargeFineFoodAI/Train'
 VAL_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Val'
 SAMPLE_PER_CLASS = 60
 NUM_CLASS_PER_TASK = 20
@@ -349,23 +349,23 @@ def run_zoo(bb=5, epochs=50):
     #print(tasks_, 'tasks')
     #print(base_tasks, 'base')
     #print(accuracies_across_tasks, 'acc')
-    '''df_multitask['task'] = tasks_
+    df_multitask['task'] = tasks_
     df_multitask['base_task'] = base_tasks
-    df_multitask['accuracy'] = accuracies_across_tasks'''
-    df_singletask['task'] = list(range(1,51))
-    df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])
+    df_multitask['accuracy'] = accuracies_across_tasks
+    '''df_singletask['task'] = list(range(1,51))
+    df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])'''
 
-    with open('food1k/model_zoo.pickle', 'wb') as f:
-        pickle.dump(df_singletask, f)
+    '''with open('food1k/model_zoo.pickle', 'wb') as f:
+        pickle.dump(df_singletask, f)'''
 
-    '''with open('food1k/model_zoo.pickle', 'rb') as f:
+    with open('food1k/model_zoo.pickle', 'rb') as f:
         df_singletask = pickle.load(f)
 
     df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
 
     summary = (df_multitask, df_singletask)
     with open('food1k/model_zoo.pickle', 'wb') as f:
-        pickle.dump(summary, f)'''
+        pickle.dump(summary, f)
     
     return zoo_log
 # %%
@@ -389,6 +389,6 @@ for i in range(EPISODES):
         task_targets = np.concatenate(task_targets)
         all_targets[i].append(task_targets)
 
-#zoo_log = run_zoo(bb=5, epochs=5)
-isolated_log = run_zoo(bb=1, epochs=5)
+zoo_log = run_zoo(bb=5, epochs=5)
+#isolated_log = run_zoo(bb=1, epochs=5)
 # %%
