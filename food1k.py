@@ -19,11 +19,11 @@ import cv2
 import os
 # %%
 dev = 'cuda'
-EPISODES = 100
+EPISODES = 50
 TRAIN_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Train'
 VAL_DATADIR = '/cis/home/jdey4/LargeFineFoodAI/Val'
 SAMPLE_PER_CLASS = 60
-NUM_CLASS_PER_TASK = 10
+NUM_CLASS_PER_TASK = 20
 IMG_SIZE = 50
 #%%
 class MyDataloader(torch.utils.data.Dataset):
@@ -42,7 +42,7 @@ food1k =  []
 
 for ii in range(EPISODES):
     food1k.append(
-        list(range(ii*10,(ii+1)*10))
+        list(range(ii*NUM_CLASS_PER_TASK,(ii+1)*NUM_CLASS_PER_TASK))
     )
 
 '''task_names = ["Aq. Mammals", "Fish",
@@ -69,7 +69,7 @@ def get_data(task=0):
     test_X = []
     test_y = []
     
-    categories_to_consider = range(task*10,(task+1)*10)
+    categories_to_consider = range(task*NUM_CLASS_PER_TASK,(task+1)*NUM_CLASS_PER_TASK)
     for category in categories_to_consider:
         path = os.path.join(TRAIN_DATADIR, str(category))
 
@@ -220,7 +220,7 @@ class SmallConv(nn.Module):
         out = self.fc2(out)
         out = self.bn_fc2(out)
         out = self.relu_fc2(out)
-        out = self.fc3(out).reshape(-1,100,10)
+        out = self.fc3(out).reshape(-1,EPISODES,NUM_CLASS_PER_TASK)
 
         #print(out.size(0), 'fsdsrv')
         out = out[torch.arange(out.size(0)), list(tasks), :]
@@ -349,23 +349,23 @@ def run_zoo(bb=5, epochs=50):
     #print(tasks_, 'tasks')
     #print(base_tasks, 'base')
     #print(accuracies_across_tasks, 'acc')
-    df_multitask['task'] = tasks_
+    '''df_multitask['task'] = tasks_
     df_multitask['base_task'] = base_tasks
-    df_multitask['accuracy'] = accuracies_across_tasks
-    '''df_singletask['task'] = list(range(1,101))
+    df_multitask['accuracy'] = accuracies_across_tasks'''
+    df_singletask['task'] = list(range(1,51))
     df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])
 
     with open('food1k/model_zoo.pickle', 'wb') as f:
-        pickle.dump(df_singletask, f)'''
+        pickle.dump(df_singletask, f)
 
-    with open('food1k/model_zoo.pickle', 'rb') as f:
+    '''with open('food1k/model_zoo.pickle', 'rb') as f:
         df_singletask = pickle.load(f)
 
     df_singletask['accuracy'][0] = df_multitask['accuracy'][0]
 
     summary = (df_multitask, df_singletask)
     with open('food1k/model_zoo.pickle', 'wb') as f:
-        pickle.dump(summary, f)
+        pickle.dump(summary, f)'''
     
     return zoo_log
 # %%
@@ -380,7 +380,7 @@ for i in range(100):
 
 all_targets = []
 
-for i in range(100):
+for i in range(EPISODES):
     all_targets.append([])
     for loader in [train_loaders[i], test_loaders[i]]:
         task_targets = []
@@ -389,6 +389,6 @@ for i in range(100):
         task_targets = np.concatenate(task_targets)
         all_targets[i].append(task_targets)
 
-zoo_log = run_zoo(bb=5, epochs=5)
-#isolated_log = run_zoo(bb=1, epochs=5)
+#zoo_log = run_zoo(bb=5, epochs=5)
+isolated_log = run_zoo(bb=1, epochs=5)
 # %%
