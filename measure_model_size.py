@@ -15,6 +15,7 @@ from tqdm import tqdm
 import pandas as pd
 import pickle
 import sys
+import joblib
 # %%
 dev = 'cpu'
 EPISODES = 10
@@ -318,7 +319,7 @@ def run_zoo(slot, shift, bb=5, epochs=1):
         
 
 
-
+        #joblib.dump(model, 'model.pickle')
 
         param_size = 0
         for param in model.parameters():
@@ -329,6 +330,7 @@ def run_zoo(slot, shift, bb=5, epochs=1):
 
         size_all_mb = (param_size + buffer_size) / 1024**2
 
+        print(size_all_mb, 'mb', get_size(model))
         #accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc']))
         print("Test Accuracies of the zoo:\n  %s\n" % str(zoo_log[ep]['test_acc']), get_size(model)/(1024**2), size_all_mb)
 
