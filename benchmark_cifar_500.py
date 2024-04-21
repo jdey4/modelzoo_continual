@@ -15,7 +15,7 @@ from tqdm import tqdm
 import pandas as pd
 import pickle
 # %%
-dev = 'cuda'
+dev = 'cpu'
 EPISODES = 10
 # %%
 # Download dataset
@@ -64,7 +64,7 @@ class custom_concat(Dataset):
 		self.targets = np.concatenate((data1.targets,data2.targets), axis=0)
 
 	def __getitem__(self, idx):
-		image = self.data[idx]
+		image = self.data[idx].reshape(-1)
 		target = self.targets[idx]
 		return (image, target)
 
@@ -121,22 +121,22 @@ class SmallConv(nn.Module):
 	def __init__(self, channels=3, avg_pool=2, lin_size=320):
 		super(SmallConv, self).__init__()
 		
-		self.layer1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1, bias=False)
-		self.bn1 = nn.BatchNorm2d(16)
-		self.relu1 = nn.ReLU()
-		self.layer2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1, bias=False)
-		self.bn2 = nn.BatchNorm2d(32)
-		self.relu2 = nn.ReLU()
-		self.layer3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False)
-		self.bn3 = nn.BatchNorm2d(64)
-		self.relu3 = nn.ReLU()
-		self.layer4 = nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False)
-		self.bn4 = nn.BatchNorm2d(128)
-		self.relu4 = nn.ReLU()
-		self.layer5 = nn.Conv2d(128, 254, kernel_size=3, stride=2, padding=1, bias=False)
-		self.bn5 = nn.BatchNorm2d(254)
-		self.relu5 = nn.ReLU()
-		self.fc1 = nn.Linear(in_features=254*2*2, out_features=2000)
+		# self.layer1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1, bias=False)
+		# self.bn1 = nn.BatchNorm2d(16)
+		# self.relu1 = nn.ReLU()
+		# self.layer2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1, bias=False)
+		# self.bn2 = nn.BatchNorm2d(32)
+		# self.relu2 = nn.ReLU()
+		# self.layer3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False)
+		# self.bn3 = nn.BatchNorm2d(64)
+		# self.relu3 = nn.ReLU()
+		# self.layer4 = nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False)
+		# self.bn4 = nn.BatchNorm2d(128)
+		# self.relu4 = nn.ReLU()
+		# self.layer5 = nn.Conv2d(128, 254, kernel_size=3, stride=2, padding=1, bias=False)
+		# self.bn5 = nn.BatchNorm2d(254)
+		# self.relu5 = nn.ReLU()
+		self.fc1 = nn.Linear(in_features=32*32*3, out_features=2000)
 		self.bn_fc1 = nn.BatchNorm1d(2000)
 		self.relu_fc1 = nn.ReLU()
 		self.fc2 = nn.Linear(in_features=2000, out_features=2000)
@@ -149,23 +149,23 @@ class SmallConv(nn.Module):
 
 	def forward(self, x, tasks):
 
-		out = self.layer1(x.float())
-		out = self.bn1(out)
-		out = self.relu1(out)
-		out = self.layer2(out)
-		out = self.bn2(out)
-		out = self.relu2(out)
-		out = self.layer3(out)
-		out = self.bn3(out)
-		out = self.relu3(out)
-		out = self.layer4(out)
-		out = self.bn4(out)
-		out = self.relu4(out)
-		out = self.layer5(out)
-		out = self.bn5(out)
-		out = self.relu5(out)
-		out = out.view(-1, 254 * 2 * 2)
-		out = self.fc1(out)
+		# out = self.layer1(x.float())
+		# out = self.bn1(out)
+		# out = self.relu1(out)
+		# out = self.layer2(out)
+		# out = self.bn2(out)
+		# out = self.relu2(out)
+		# out = self.layer3(out)
+		# out = self.bn3(out)
+		# out = self.relu3(out)
+		# out = self.layer4(out)
+		# out = self.bn4(out)
+		# out = self.relu4(out)
+		# out = self.layer5(out)
+		# out = self.bn5(out)
+		# out = self.relu5(out)
+		# out = out.view(-1, 254 * 2 * 2)
+		out = self.fc1(x.float())
 		out = self.bn_fc1(out)
 		out = self.relu_fc1(out)
 		out = self.fc2(out)
@@ -272,16 +272,16 @@ def run_zoo(slot, shift, bb=5, epochs=50):
 	zoo_log = {}
 	train_losses = []
 
-	'''tasks_ = []
+	tasks_ = []
 	base_tasks = []
 	accuracies_across_tasks = []
-	df_multitask = pd.DataFrame()'''
+	df_multitask = pd.DataFrame()
 	singletask_accuracy = []
 	df_singletask = pd.DataFrame()
 
 	for ep in range(EPISODES):
-		'''base_tasks.extend([ep+1]*(ep+1))
-		tasks_.extend(list(range(1,ep+2)))'''
+		base_tasks.extend([ep+1]*(ep+1))
+		tasks_.extend(list(range(1,ep+2)))
 
 		print("Epsisode " + str(ep))
 		zoo_outputs[ep] = [[], []]  
@@ -293,15 +293,19 @@ def run_zoo(slot, shift, bb=5, epochs=50):
 		zoo_log[ep] = evaluate_zoo(ep, zoo_outputs)
 		train_losses = zoo_log[ep]["train_loss"]
 
-		#accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc']))
+		'''accuracies_across_tasks.extend(list(zoo_log[ep]['test_acc']))
 		print("Test Accuracies of the zoo:\n  %s\n" % str(zoo_log[ep]['test_acc']))
 
-	#print(tasks_, 'tasks')
-	#print(base_tasks, 'base')
-	#print(accuracies_across_tasks, 'acc')
-	'''df_multitask['task'] = tasks_
+	print(tasks_, 'tasks')
+	print(base_tasks, 'base')
+	print(accuracies_across_tasks, 'acc')
+	df_multitask['task'] = tasks_
 	df_multitask['base_task'] = base_tasks
-	df_multitask['accuracy'] = accuracies_across_tasks'''
+	df_multitask['accuracy'] = accuracies_across_tasks
+	
+	with open('results/model_zoo_'+ str(slot)+'_'+str(shift)+'.pickle', 'wb') as f:
+		pickle.dump(df_multitask, f)'''
+	
 	df_singletask['task'] = list(range(1,11))
 	df_singletask['accuracy'] = list(zoo_log[ep]['test_acc'])
 
@@ -316,8 +320,11 @@ def run_zoo(slot, shift, bb=5, epochs=50):
 	
 	return zoo_log
 # %%
-for shift in range(1,7):
+for shift in range(6):
 	for slot in range(10):
+		'''if shift==0 and slot<2:
+			continue'''
+
 		# Create dataloaders for each task
 		train_loaders = []
 		test_loaders = []
